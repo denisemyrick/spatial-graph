@@ -19,21 +19,29 @@ In this lab, you will:
 
 1. Open **Datasets**, open the menu for `SERVICE_CENTER_ADDRESSES`, select **Prepare**, and then select **Geocode Addresses**.
 
+  ![Geocode addresses](./images/geocode-addresses.png "Geocode-addresses")
+
 2. On the **Setup** tab, keep **Single column address** off. Map `ADDRESS`, `CITY`, `STATE`, `POSTAL_CODE`, and `COUNTRY` to the matching address components.
+
+  ![Setup geocode](./images/geocode-setup.png "Geocode-addresses")
 
 3. Switch **Save coordinates in columns** on. Enter `LATITUDE` and `LONGITUDE` as the output column names, then select **Apply**.
 
+  ![Setup geocode](./images/geocode-setup1.png "Geocode-addresses")
+
 4. Open **Jobs** and wait for the geocoding job to finish. If a row fails, inspect its address fields before rerunning the job.
 
-5. Open the dataset properties and confirm that `GC_GEOMETRY` is present as an `SDO_GEOMETRY` column. Preview the dataset on a map.
+  ![Jobs page](./images/spatial-jobs.png "Jobs page")
 
-    Geocoding calls an Oracle-hosted service on the public internet. If it fails, ask the instructor to check the Spatial Studio proxy setup.
+5. Open the dataset properties and confirm that `GC_GEOMETRY` is present as an `SDO_GEOMETRY` column.
+
+  ![Dataset properties](./images/dataset-properties.png "Dataset properties")
 
 ## Task 2: Create the project
 
 1. Open **Projects** and select **Create Project**.
 
-2. Enter `Regional Operations Explorer` as the project name and enter `Movement, weather, wind, and response coverage` as the description.
+2. Click **Actions**, and then **Save project as...**. Enter `Regional Operations Explorer` as the project name and enter `Movement, weather, wind, and response coverage` as the description.
 
 3. Select **Create**, and then save the project.
 

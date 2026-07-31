@@ -16,28 +16,33 @@
         "description": "Login to Oracle Cloud",
         "filename": "https://livelabs.oracle.com/cdn/common/labs/cloud-login/cloud-login.md"
     }, 
+  {
+      "title": "Lab 1: Create User and Access Spatial Studio",
+      "filename": "../../../adbs-access-spatial-studio/access-spatial-studio.md"
+  },
    {
-      "title": "Lab 1: Access Spatial Studio",
+      "title": "Lab 2: Load Spatial Data",
+      "filename": "../../../adbs-access-upload/access-upload.md"
+
+  },
+  {
+      "title": "Lab 3: Access Spatial Studio",
       "filename": "../../../adbs-create-project/create-project.md"
   },
   {
-      "title": "Lab 2: Load Spatial Data",
-      "filename": "../../../adbs-access-upload/access-upload.md"
-  },
-  {
-    "title": "Lab 3: Create Project",
+    "title": "Lab 4: Create Project",
     "filename": "../../../adbs-create-project/create-project.md"
 },
 {
-  "title": "Lab 4: Explore Historical Asset Movement",
+  "title": "Lab 5: Explore Historical Asset Movement",
   "filename": "../../../adbs-temporal-h3/temporal-h3.md"
 },
 {
-  "title": "Lab 5: Annotate the Map with Redline Tools",
+  "title": "Lab 6: Annotate the Map with Redline Tools",
   "filename": "../../../adbs-apply-redline/redline-tools.md"
 },
 {
-  "title": "Lab 6: Visualize Wind Flow and Tune Animations",
+  "title": "Lab 7: Visualize Wind Flow and Tune Animations",
   "filename": "../../../adbs-wind-animations/wind-animations.md"
 },
 {
