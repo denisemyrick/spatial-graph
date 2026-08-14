@@ -16,13 +16,17 @@ In this lab, you will:
 
 ## Task 1: Create an H3 coverage layer
 
-1. Save the project, open **Datasets**, and open the menu for `WEATHER_OBSERVATIONS`.
+1. Open **Datasets**, and open the menu for `WEATHER_OBSERVATIONS`.
 
 2. Select **Prepare**, and then select **Create H3 Index**.
+
+  ![Create H3 index](./images/create-h3-index.png "Create H3 index")
 
 3. Select the dataset geometry column and select **Count** as the summarize option.
 
 4. Name the result `WEATHER_OBSERVATIONS_H3` and select **OK**.
+
+  ![Create H3 index](./images/h3-index-weather.png "Create H3 index")
 
 5. Wait for the H3 dataset to appear. Add it to `Regional Operations Explorer` and drag it onto the map.
 

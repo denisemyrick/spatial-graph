@@ -57,7 +57,7 @@ In this lab, you will:
 
   ![Add dataset](./images/add-dataset.png "Add dataset")
 
-2. Select `SERVICE_CENTER_ADDRESSES`, `SERVICE_CENTERS`, `FIELD_ASSET_HISTORY`, and `WEATHER_OBSERVATIONS`, and then select **OK**.
+2. Select `SERVICE_CENTER_ADDRESSES`, `SERVICE_CENTERS`, and `WEATHER_OBSERVATIONS`, and then select **OK**.
 
   ![Add datasets](./images/add-datasets.png "Add datasets")
 
@@ -69,11 +69,7 @@ In this lab, you will:
 
   ![Add weather observations to map](./images/weather-observations.png "Add weather observations to map")
 
-5. Drag `FIELD_ASSET_HISTORY` onto the map.
-
-  ![Add field asset history to map](./images/field-asset-history.png "Add field asset history to map")
-
-    Spatial Studio renders later layers above earlier layers. Use the Layers list to change visibility while you inspect each dataset.
+5. Spatial Studio renders later layers above earlier layers. Use the Layers list to change visibility while you inspect each dataset.
 
       ![Move layers](./images/move-layers.png "Move layers")
 
@@ -84,7 +80,7 @@ In this lab, you will:
   ![Open settings](./images/service-center-addresses-settings.png "Open settings")
   ![Change formatting](./images/service-center-addresses-layer.png "Change formatting")
 
-2. Open the `WEATHER_OBSERVATIONS` layer settings and apply data-driven color using `WIND_SPEED`.
+2. Open the `WEATHER_OBSERVATIONS` layer settings and apply data-driven color using `WIND_SPEED`. Use **back arrow** to return to **Data**.
 
   ![Open settings](./images/weather-obs-settings.png "Open settings")
   ![Choose based on data](./images/weather-obs-based-on-data.png "Choose based on data")
@@ -102,7 +98,11 @@ In this lab, you will:
 
   ![Highlight map](./images/highlight-table.png "Highlight map")
 
-6. Save the project.
+6. Remove table as it will not be used in follow on labs.
+
+  ![Remove table](./images/remove-table.png "Remove table")
+
+7. Save the project.
 
 ## Learn More
 
@@ -112,6 +112,5 @@ In this lab, you will:
 
 ## Acknowledgements
 
-* **Authors** - Oracle LiveLabs
-* **Last Updated By/Date** - Oracle LiveLabs, July 2026
-* **Source** - [Typical Workflow for Visualizing Spatial Data](https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adstu/typical-workflow-visualizing-spatial-data.html)
+- **Authors** Denise Myrick, Oracle Database Product Management
+-* **Last Updated By/Date** - Denise Myrick, Oracle Database Product Management, August 2026

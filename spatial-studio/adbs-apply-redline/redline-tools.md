@@ -16,53 +16,65 @@ In this lab, you will:
 
 ## Task 1: Draw an advisory area and access route
 
-1. Open `Regional Operations Explorer` and zoom to the service centers.
+1. Under Data, click **Add dataset**, then select `SERVICE_CENTERS`. Click **OK**.
 
-2. Select **Actions** on the map toolbar, and then select **Redline**.
+  ![Add service centers dataset](./images/add-service-centers-dataset.png "Add service centers dataset")
 
-3. Select **Draw Polygon** and draw an advisory area that intersects several weather observations.
+2. Drop `SERVICE_CENTERS` onto map.
+
+  ![Add service centers to map](./images/add-service-centers-map.png "Add service centers to map")
+
+3. Select **Actions** on the map toolbar, and then select **Redline**.
+
+  ![Turn on Redline](./images/redline.png "Turn on Redline")
+
+4. Select **Draw Polygon** and draw an advisory area that intersects several weather observations.
+
+  ![Draw polygon](./images/polygon.png "Draw polygon")
+
+    Tip: Right-click and choose **Close polygon** to complete the drawing.
 
 4. Select **Draw Line** and trace a possible access route from the nearest service center into the advisory area.
 
-5. Select **Draw Point** and mark a proposed staging location.
+  ![Draw line](./images/line.png "Draw line")
 
-6. Change the drawing color and add a rectangle or circle to mark another area of interest.
+    Tip: Right-click and choose **Close polygon** to complete the drawing.
+
+5. The orange color of the line is difficult to see. Select the line and click **Edit Feature Properties**, then choose a different color so the line stands out more. You can also change the width.
+
+  ![Edit line](./images/edit-line.png "Edit line")
+
+6. Select **Draw Point** to mark a proposed staging location. Select the point and click **Edit Feature Properties**, then choose a different color so the point stands out more. You can also change the width.
+
+  ![Edit point](./images/point.png "Edit point")
 
 ## Task 2: Edit the Redline features
 
-1. Select **Select Feature**, and then select the advisory polygon.
+1. Select **Select feature**, and then select the advisory polygon.
 
 2. Move one or more vertices to refine its boundary.
 
+  ![Resize polygon](./images/resize-polygon.png "Resize polygon")
+
 3. Open **Edit Feature Properties**, enter `Weather advisory area` as the description, and adjust its fill or outline.
 
-4. Duplicate the staging point and move the copy to a second location.
+  ![Edit polygon](./images/edit-polygon.png "Edit polygon")
 
-5. Select the rectangle, press `ctrl + r`, and drag to rotate it.
+4. Select the polygon and place your mouse near one of the edges. The mouse pointer will turn into a rotation icon. Click and drag to rotate the polygon.
 
-6. Press `ctrl + s` and drag to resize the selected rectangle.
+  ![Rotate polygon](./images/rotate-polygon.png "Rotate polygon")
 
-7. Press `esc` to clear the selection.
+## Task 3: Toggle Visibility
 
-## Task 3: Save and export the drawing set
+1. In the Redline toolbar, select **Toggle Visibility**.
 
-1. Select **Save** to persist the Redline drawings with the project.
+  ![Visibility on](./images/visibility-on.png "Visibility on")
 
-2. In the Redline toolbar, select **Export Features**.
+2. Observe that the shapes appear and disappear as you toggle the button.
 
-3. Select **Download as GeoJson** and save the file as `regional-operations-redline.geojson`.
+  ![Visibility off](./images/visibility-off.png "Visibility off")
 
-4. Note that the export preserves feature IDs and descriptions but does not preserve custom colors or outline widths.
-
-5. Toggle Redline visibility off and on to confirm that the saved features remain available.
-
-## Task 4: Check your work
-
-1. Close and reopen the project.
-
-2. Open the Redline tool again so the saved shapes become editable.
-
-3. Select the advisory polygon and confirm that its description is present.
+3. Select **Save** to persist the Redline drawings with the project.
 
 You may now **proceed to the next lab**.
 
@@ -72,6 +84,5 @@ You may now **proceed to the next lab**.
 
 ## Acknowledgements
 
-- **Authors** - Oracle LiveLabs
-- **Last Updated By/Date** - Oracle LiveLabs, July 2026
-- **Source** - [Style a Map Layer](https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adstu/style-map-layer1.html)
+- **Authors** - Denise Myrick, Oracle Database Product Management
+- **Last Updated By/Date** - Denise Myrick, August 2026
