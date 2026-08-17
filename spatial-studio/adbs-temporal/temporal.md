@@ -86,4 +86,3 @@ You may now **proceed to the next lab**.
 
 - **Authors** - Denise Myrick, Oracle Database Product Management
 - **Last Updated By/Date** - Denise Myrick, August 2026
-- **Source** - [Using Oracle Spatial Studio on Autonomous AI Database, Release 26.1](https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adstu/get-started-using-spatial-studio1.html)

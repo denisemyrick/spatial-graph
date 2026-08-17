@@ -30,7 +30,12 @@ In this lab, you will:
 
 5. Wait for the H3 dataset to appear. Add it to `Regional Operations Explorer` and drag it onto the map.
 
+  ![Add H3 index](./images/h3-dataset.png "Add H3 index")
+
 6. Open the H3 layer settings and apply data-driven color using the count field. Zoom in and out to compare the hexagonal coverage pattern.
+
+  ![Apply data-driven color](./images/h3-based-on-data.png "Apply data-driven color")
+  ![Pick count](./images/pick-cnt.png "Pick count")
 
     H3 summarizes the input points in a hierarchy of hexagonal cells. The result is most useful for finding concentration patterns, not for replacing the original weather readings.
 
@@ -40,9 +45,16 @@ In this lab, you will:
 
 2. Open the menu for `SERVICE_CENTERS`, select **Prepare**, and then select **Validate/Fix geometries**.
 
+  ![Validate geometries](./images/service-centers-geocode.png "Validate geometries")
+
 3. Run the geometry check and confirm that the dataset has no unresolved invalid geometries.
 
+  ![Validate geometries](./images/run-validations.png "Validate geometries")
+
 4. Repeat the geometry check for `WEATHER_OBSERVATIONS`.
+
+  ![Validate geometries](./images/run-validations2.png "Validate geometries")
+  ![Validate geometries](./images/run-validations3.png "Validate geometries")
 
 5. Reopen `Regional Operations Explorer` and make both source layers visible.
 
@@ -50,7 +62,11 @@ In this lab, you will:
 
 1. Open the `WEATHER_OBSERVATIONS` layer menu and select **Spatial Analysis**.
 
+  ![Open spatial analysis](./images/weather-analysis.png "Open spatial analysis")
+
 2. Open the **Filter** category and select **Return shapes within a specific distance of another**.
+
+  ![Open spatial analysis](./images/open-analysis.png "Open spatial analysis")
 
 3. Name the analysis `WEATHER_WITHIN_25_KM`.
 
@@ -58,11 +74,15 @@ In this lab, you will:
 
 5. Select `SERVICE_CENTERS` as the filter layer.
 
-6. Enter `25` and select kilometers as the unit.
+6. Enter `25` and select kilometer as the unit.
 
 7. Select **Run** and wait for the analysis result to appear under Analyses.
 
+  ![Fill out analysis form](./images/within-distance.png "Fill out analysis form")
+
 8. Drag `WEATHER_WITHIN_25_KM` onto the map and apply a distinct color.
+
+  ![Add analysis](./images/add-analysis.png "Add analysis")
 
 9. Toggle the result layer to compare included and excluded observations.
 
@@ -70,13 +90,19 @@ In this lab, you will:
 
 1. Display `WEATHER_WITHIN_25_KM`, `WEATHER_OBSERVATIONS_H3`, and the original observations together.
 
+  ![Display analysis](./images/display-observations.png "Display analysis")
+
 2. Compare the analysis result with the wind flow, H3 clusters, and asset history.
+
+  ![Review all layers](./images/review-layers.png "Review all layers")
 
 3. Save `Regional Operations Explorer`.
 
+  ![Save project](./images/save-projects.png "Save project")
+
 4. Confirm that both derived datasets appear on the Datasets page and remain available to another project.
 
-5. Record one operational issue that the combined project can answer and one additional dataset that would improve the analysis.
+  ![Check datasets](./images/check-datasets.png "Check datasets")
 
 You may now **proceed to the next step**.
 
@@ -87,6 +113,5 @@ You may now **proceed to the next step**.
 
 ## Acknowledgements
 
-* **Authors** - Oracle LiveLabs
-* **Last Updated By/Date** - Oracle LiveLabs, July 2026
-* **Source** - [Using Oracle Spatial Studio on Autonomous AI Database, Release 26.1](https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adstu/get-started-using-spatial-studio1.html)
+- **Authors** - Denise Myrick, Oracle Database Product Management
+- **Last Updated By/Date** - Denise Myrick, August 2026

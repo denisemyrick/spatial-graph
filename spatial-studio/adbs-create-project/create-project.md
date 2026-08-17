@@ -1,8 +1,8 @@
-# Geocode Service Centers and Build a Base Map
+# Load Wind Data, Geocode Service Centers, and Build a Base Map
 
 ## Introduction
 
-Geocoding turns address details into a geometry that you can map and analyze. You will geocode the supplied service-center addresses, create a project, and build a map and table that answer basic operations questions.
+Geocoding turns address details into geometry that you can map and analyze. You will also load an R/G-encoded wind image into GeoRaster and create the wind dataset used later in the workshop. You will then create a project and build a base map.
 
 Estimated Time: 25 minutes
 
@@ -11,9 +11,11 @@ Estimated Time: 25 minutes
 In this lab, you will:
 
 - Geocode an address dataset and verify its result.
+- Load a wind image into Oracle Spatial GeoRaster.
+- Create the `REGIONAL_WIND_FLOW` dataset.
 - Create and save a Spatial Studio project.
 - Add operational datasets to a map.
-- Style point layers and inspect records in a table.
+- Style point layers and inspect feature attributes on the map.
 
 ## Task 1: Geocode the service-center addresses
 
@@ -37,7 +39,56 @@ In this lab, you will:
 
   ![Dataset properties](./images/dataset-properties.png "Dataset properties")
 
-## Task 2: Create the project
+## Task 2: Load the wind image into GeoRaster
+
+1. Obtain the following workshop values from your instructor:
+
+    - The Object Storage pre-authenticated request URL for the encoded wind image
+    - The relative object path, if the URL grants access to a bucket instead of one object
+    - The image SRID and bounding coordinates, unless the image contains supported spatial metadata
+    - The minimum and maximum `u` and `v` speed values
+
+    Treat the PAR URL as a temporary credential. Do not paste it into workshop notes, screenshots, or chat.
+
+2. Confirm that the Spatial Studio header shows the dedicated compute node as **Attached**. If it shows **Detached**, ask the instructor to attach the workshop compute node before continuing.
+
+3. Open **Datasets**, select **Create Dataset**, and then select **Imagery file via PAR URL**.
+
+4. Enter the instructor-provided PAR URL. Enter the relative object path only when the URL points to a bucket, then select **Create**.
+
+5. Review the `gdalinfo` output. Confirm that Spatial Studio detects the image dimensions, bands, and spatial metadata without errors, then select **Next**.
+
+6. Keep **Create GeoRaster dataset** off. This task loads the image into a GeoRaster table; you will create the wind dataset in Task 3.
+
+7. Select your workshop database link, choose **Create new GeoRaster table**, and enter `REGIONAL_WIND_GEORASTER` as the table name.
+
+8. Enter `1` as the key, enter `Regional operations wind field` as the summary, and create a raster data table named `REGIONAL_WIND_RDT`.
+
+9. Use the spatial metadata detected in the image. If Spatial Studio does not detect it, enter the SRID and bounding coordinates supplied by the instructor.
+
+10. Retain the remaining storage defaults, review the summary, and select **OK**.
+
+11. Open **Jobs** and wait for the GeoRaster load to finish successfully.
+
+## Task 3: Create the wind dataset
+
+1. Return to **Datasets**, select **Create Dataset**, and then select **Database table/view**.
+
+2. Select your workshop database link and select **Create**.
+
+3. Open **GeoRasters**, select `REGIONAL_WIND_GEORASTER`, and select **OK**.
+
+4. Set **Selection Mode** to **Single Raster** and switch **Wind Animation** on.
+
+5. Enter the instructor-provided minimum and maximum values for the `u` and `v` speed components.
+
+6. Select **OK** to create the dataset.
+
+7. If Spatial Studio assigns a different display name, open the dataset properties and rename it `REGIONAL_WIND_FLOW`.
+
+8. Confirm that `REGIONAL_WIND_FLOW` appears on the Datasets page and that its GeoRaster properties show **Wind Animation** enabled.
+
+## Task 4: Create the project
 
 1. Open **Projects** and select **Create Project**.
 
@@ -51,7 +102,7 @@ In this lab, you will:
 
   ![Save as](./images/save-as.png "Save as")
 
-## Task 3: Add the uploaded datasets
+## Task 5: Add the uploaded datasets
 
 1. In the active project, open the **Data** tab and select **Add Dataset**.
 
@@ -73,7 +124,7 @@ In this lab, you will:
 
       ![Move layers](./images/move-layers.png "Move layers")
 
-## Task 4: Style and inspect the layers
+## Task 6: Style and inspect the layers
 
 1. Open the `SERVICE_CENTER_ADDRESSES` layer menu, select **Settings**, and choose a distinct point color and a larger radius.
 
