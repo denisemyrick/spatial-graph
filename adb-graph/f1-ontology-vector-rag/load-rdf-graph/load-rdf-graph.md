@@ -37,13 +37,13 @@ Estimated Time: 10 minutes
     SELECT document_id,
            chunk_id,
            '<https://example.com/f1/' ||
-             SUBSTR(subject_id, INSTR(subject_id, ':') + 1) || '>',
+             REPLACE(SUBSTR(subject_id, INSTR(subject_id, ':') + 1), ' ', '%20') || '>',
            '<https://example.com/f1/' ||
-             SUBSTR(predicate, INSTR(predicate, ':') + 1) || '>',
+             REPLACE(SUBSTR(predicate, INSTR(predicate, ':') + 1), ' ', '%20') || '>',
            CASE
              WHEN object_kind = 'iri' THEN
                '<https://example.com/f1/' ||
-                 SUBSTR(object_value, INSTR(object_value, ':') + 1) || '>'
+                 REPLACE(SUBSTR(object_value, INSTR(object_value, ':') + 1), ' ', '%20') || '>'
              WHEN datatype_uri IS NOT NULL THEN
                '"' || REPLACE(object_value, '"', '\\"') ||
                  '"^^<' || datatype_uri || '>'
@@ -65,7 +65,7 @@ Estimated Time: 10 minutes
     ```sql
     BEGIN
       SEM_APIS.BULK_LOAD_RDF_GRAPH(
-        model_name    => 'F1_2026_GRAPH',
+        rdf_graph_name => 'F1_2026_GRAPH',
         table_owner   => USER,
         table_name    => 'F1_RDF_LOAD_STG',
         network_owner => 'F1_ANALYST',
@@ -97,6 +97,15 @@ Estimated Time: 10 minutes
       )
     )
     FETCH FIRST 25 ROWS ONLY;
+    ```
+
+    On Autonomous Database environments where Java is disabled, `SEM_MATCH`
+    can return `ORA-29538: Java not installed`. The bulk load has still
+    completed; verify the schema-private graph directly with:
+
+    ```sql
+    SELECT COUNT(*) AS graph_triples
+    FROM "F1_NET#RDFT_F1_2026_GRAPH";
     ```
 
 2. Search the staging table for a named concept, such as DRS, and note its source provenance.

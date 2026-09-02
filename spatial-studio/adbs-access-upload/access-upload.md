@@ -61,6 +61,5 @@ You may now **proceed to the next lab**.
 
 ## Acknowledgements
 
-- **Authors** - Oracle LiveLabs
-- **Last Updated By/Date** - Oracle LiveLabs, July 2026
-- **Source** - [Create a Dataset by Uploading a File](https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adstu/create-dataset-uploading-file.html)
+- **Authors** - Denise Myrick, Oracle Database Product Management
+- **Last Updated By/Date** - Denise Myrick, August 2026

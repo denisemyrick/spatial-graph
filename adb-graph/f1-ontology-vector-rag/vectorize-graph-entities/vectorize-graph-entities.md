@@ -10,7 +10,7 @@ Estimated Time: 15 minutes
 
 - Create one graph-fact card per RDF entity.
 - Generate a vector embedding for each card.
-- Inspect semantic nearest-neighbour results for an F1 question.
+- Inspect semantic nearest-neighbor results for an F1 question.
 
 ## Task 1: Create graph entity cards
 
@@ -56,7 +56,7 @@ Estimated Time: 15 minutes
     COMMIT;
     ```
 
-    The card is an RDF-focused retrieval unit. It is not a replacement for the graph; it gives vector search enough context to choose a useful graph neighbourhood.
+    The card is an RDF-focused retrieval unit. It is not a replacement for the graph; it gives vector search enough context to choose a useful graph neighborhood.
 
 ## Task 2: Generate entity-card embeddings
 
@@ -91,7 +91,7 @@ Estimated Time: 15 minutes
 
 ## Task 3: Inspect vector retrieval
 
-1. Run a nearest-neighbour search and inspect the retrieved entity cards.
+1. Run a nearest-neighbor search and inspect the retrieved entity cards.
 
     ```sql
     WITH question_vector AS (
@@ -117,5 +117,5 @@ Estimated Time: 15 minutes
 
 ## Acknowledgements
 
-* **Source** - [Oracle AI Vector Search documentation](https://docs.oracle.com/en/database/oracle/oracle-database/26/vecse/ai-vector-search-users-guide.pdf).
-* **Last Updated** - August 4, 2026
+- **Author** - Oracle Graph Product Management, Oracle
+- **Last Updated** - August 2026

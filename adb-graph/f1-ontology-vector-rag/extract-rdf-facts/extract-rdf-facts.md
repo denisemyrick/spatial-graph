@@ -62,14 +62,29 @@ Estimated Time: 15 minutes
           '"object_kind":"iri or literal","datatype":"IRI or null",' ||
           '"unit":"unit or null"}]}. ' ||
           'Use only this ontology: f1:VehicleFeature rdf:type owl:Class. ' ||
-          'f1:EnergyMode rdfs:subClassOf f1:VehicleFeature. ' ||
-          'f1:AeroMode rdfs:subClassOf f1:VehicleFeature. ' ||
-          'f1:LegacySystem rdfs:subClassOf f1:VehicleFeature. ' ||
+          'f1:VehicleDimension rdf:type owl:Class. ' ||
+          'f1:Measurement rdf:type owl:Class. ' ||
+          'f1:Unit rdf:type owl:Class. ' ||
+          'f1:EnergyMode rdf:type owl:Class; rdfs:subClassOf f1:VehicleFeature. ' ||
+          'f1:AeroMode rdf:type owl:Class; rdfs:subClassOf f1:VehicleFeature. ' ||
+          'f1:LegacySystem rdf:type owl:Class; rdfs:subClassOf f1:VehicleFeature. ' ||
+          'f1:ChargingTechnique rdf:type owl:Class. ' ||
+          'f1:Tyre rdf:type owl:Class. ' ||
+          'f1:FrontTyre rdf:type owl:Class; rdfs:subClassOf f1:Tyre. ' ||
+          'f1:RearTyre rdf:type owl:Class; rdfs:subClassOf f1:Tyre. ' ||
+          'f1:LengthMeasurement rdfs:subClassOf f1:Measurement. ' ||
+          'f1:WeightMeasurement rdfs:subClassOf f1:Measurement. ' ||
           'f1:usesFeature rdf:type owl:ObjectProperty. ' ||
-          'f1:usesEnergyMode rdfs:subPropertyOf f1:usesFeature. ' ||
-          'f1:usesAeroMode rdfs:subPropertyOf f1:usesFeature. ' ||
+          'f1:hasMeasurement rdf:type owl:ObjectProperty. ' ||
+          'f1:hasUnit rdf:type owl:ObjectProperty. ' ||
+          'f1:measures rdf:type owl:ObjectProperty. ' ||
+          'f1:usesEnergyMode rdf:type owl:ObjectProperty; rdfs:subPropertyOf f1:usesFeature. ' ||
+          'f1:usesAeroMode rdf:type owl:ObjectProperty; rdfs:subPropertyOf f1:usesFeature. ' ||
           'f1:replacesSystem rdf:type owl:ObjectProperty. ' ||
-          'f1:replacedBy owl:inverseOf f1:replacesSystem. ' ||
+          'f1:replacedBy rdf:type owl:ObjectProperty; owl:inverseOf f1:replacesSystem. ' ||
+          'f1:occursDuring rdf:type owl:ObjectProperty. ' ||
+          'f1:disables rdf:type owl:ObjectProperty. ' ||
+          'f1:keepsState rdf:type owl:ObjectProperty. ' ||
           'f1:Tyre owl:sameAs f1:Tire. ' ||
           'Text to extract from: ' ||
           DBMS_LOB.SUBSTR(r.chunk_text, 12000, 1);
@@ -80,6 +95,20 @@ Estimated Time: 15 minutes
           action       => 'chat'
         );
 
+        -- Some chat models add a Markdown fence or a short preamble around
+        -- otherwise-valid JSON. Extract the outer JSON object before the
+        -- staging table's IS JSON check.
+        l_response := REGEXP_SUBSTR(
+          l_response,
+          '\{.*\}', 1, 1, 'n', 0
+        );
+        IF l_response IS NULL THEN
+          RAISE_APPLICATION_ERROR(
+            -20001,
+            'The chat model did not return a JSON object for this chunk.'
+          );
+        END IF;
+
         INSERT INTO f1_rdf_extract_stg (document_id, chunk_id, response)
         VALUES (r.document_id, r.chunk_id, l_response);
       END LOOP;
@@ -88,7 +117,7 @@ Estimated Time: 15 minutes
     /
     ```
 
-    In a production workshop, replace the abbreviated ontology in this code block with your complete approved ontology. Keep the text chunk outside the quoted ontology prompt and join it with `||`.
+    Extend the ontology in this code block only with approved terms. Keep the text chunk outside the quoted ontology prompt and join it with `||`.
 
 ## Task 3: Parse JSON into triple rows
 
@@ -117,7 +146,24 @@ Estimated Time: 15 minutes
     ) jt
     WHERE jt.subject_id IS NOT NULL
       AND jt.object_value IS NOT NULL
-      AND LOWER(jt.object_kind) IN ('iri', 'literal');
+      AND LOWER(jt.object_kind) IN ('iri', 'literal')
+      AND LOWER(jt.predicate) IN (
+        'f1:usesfeature',
+        'f1:usesenergymode',
+        'f1:usesaeromode',
+        'f1:hasmeasurement',
+        'f1:hasunit',
+        'f1:measures',
+        'f1:replacessystem',
+        'f1:replacedby',
+        'f1:occursduring',
+        'f1:disables',
+        'f1:keepsstate',
+        'rdf:type',
+        'rdfs:subclassof',
+        'owl:inverseof',
+        'owl:sameas'
+      );
 
     COMMIT;
     ```
@@ -133,5 +179,5 @@ Estimated Time: 15 minutes
 
 ## Acknowledgements
 
-* **Source** - [Oracle DBMS_CLOUD_AI documentation](https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adbsb/dbms-cloud-ai-package.html).
-* **Last Updated** - August 4, 2026
+- **Author** - Oracle Graph Product Management, Oracle
+- **Last Updated** - August 2026

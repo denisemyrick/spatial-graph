@@ -25,11 +25,11 @@ In this lab, you will:
 
 3. Click Database Actions, then select Database Users.
 
-  ![Database users](./images/database-user.png "Database Users")
+  ![Database users](./images/database-users.png "Database Users")
 
 4. Click Create User
 
-  ![Create user](./images/database-user.png "Create user")
+  ![Create user](./images/create-user.png "Create user")
 
 5. Fill in the form. Include the username, password, select the Quota on tablespace DATA, toggle on REST, GraphQL, MongoDB API, and Web access
  and Spatial. Then click Create User.

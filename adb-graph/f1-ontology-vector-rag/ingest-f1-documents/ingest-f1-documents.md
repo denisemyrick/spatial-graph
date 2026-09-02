@@ -2,9 +2,9 @@
 
 ## Introduction
 
-In this lab, you will store two F1 PDFs in Oracle Database, extract text from them, and split the text into overlapping chunks. Chunking is the bridge between an original document and downstream AI operations: it gives extraction and embedding models focused, bounded input while preserving the source document identity.
+In this lab, you will store two F1 PDFs in Oracle AI Database, extract text from them, and split the text into overlapping chunks. Chunking is the bridge between an original document and downstream AI operations: it gives extraction and embedding models focused, bounded input while preserving the source document identity.
 
-Estimated Time: 10 minutes
+Estimated Time: 15 minutes
 
 ### Objectives
 
@@ -13,7 +13,53 @@ Estimated Time: 10 minutes
 - Verify text extraction.
 - Create overlapping chunks for every loaded document.
 
-## Task 1: Create document storage
+## Task 1: Enable Oracle JVM for RDF queries
+
+`SEM_MATCH`, used in Lab 3, requires Oracle JVM on Autonomous Database. If
+your database already reports `JAVAVM` as `VALID`, skip the enable command and
+continue with the verification query.
+
+1. Connect to the database as `ADMIN`. The feature cannot be enabled from the
+   `F1_ANALYST` schema.
+
+2. Request Oracle JVM installation.
+
+    ```sql
+    BEGIN
+      DBMS_CLOUD_ADMIN.ENABLE_FEATURE(
+        feature_name => 'JAVAVM'
+      );
+    END;
+    /
+    ```
+
+3. Restart the Autonomous Database from the OCI Console. The restart is
+   required for the installation to proceed. Enabling Oracle JVM is permanent
+   for this database.
+
+4. After the database is available, remain connected as `ADMIN` and verify
+   the component status.
+
+    ```sql
+    SELECT status, version
+    FROM dba_registry
+    WHERE comp_id = 'JAVAVM';
+    ```
+
+    Continue when the result is `VALID`. If the result is `LOADING`, wait and
+    run the query again. If no row is returned, Oracle JVM is not enabled.
+
+5. Verify that the Java runtime is available.
+
+    ```sql
+    SELECT dbms_java.get_jdk_version
+    FROM dual;
+    ```
+
+    Reconnect as `F1_ANALYST` before continuing with the remaining tasks in
+    this lab.
+
+## Task 2: Create document storage
 
 1. Create a table that stores each PDF once.
 
@@ -42,7 +88,7 @@ Estimated Time: 10 minutes
 
     The composite primary key matters because chunk numbering restarts for each document. A chunk is identified by the pair `(document_id, chunk_id)`.
 
-## Task 2: Load the two PDFs
+## Task 3: Load the two PDFs
 
 1. Replace the PAR URL placeholders and run the inserts.
 
@@ -71,7 +117,7 @@ Estimated Time: 10 minutes
     ORDER BY document_id;
     ```
 
-## Task 3: Extract text and create chunks
+## Task 4: Extract text and create chunks
 
 1. Preview the first 1,000 characters from every PDF.
 
@@ -123,5 +169,6 @@ Estimated Time: 10 minutes
 
 ## Acknowledgements
 
-* **Source** - [Oracle DBMS_VECTOR_CHAIN documentation](https://docs.oracle.com/en/database/oracle/oracle-database/26/vecse/dbms_vector_chain-vecse.html).
-* **Last Updated** - August 4, 2026
+- **Author** - Oracle Graph Product Management, Oracle
+- **Oracle Java** - [Use Oracle Java on Autonomous AI Database](https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/autonomous-oracle-java.html)
+- **Last Updated** - August 2026

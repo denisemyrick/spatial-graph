@@ -62,5 +62,3 @@ You may now **proceed to the next lab**.
 
 - **Authors** - Oracle LiveLabs
 - **Last Updated By/Date** - Oracle LiveLabs, July 2026
-- **Source** - [Visualize a Wind Animation Dataset](https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adstu/visualize-wind-animation-dataset.html)
-- **Source** - [About Wind Animation](https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adstu/wind-animation.html)

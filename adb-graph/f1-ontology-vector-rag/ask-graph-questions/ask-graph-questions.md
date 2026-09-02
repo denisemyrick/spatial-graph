@@ -188,5 +188,5 @@ Estimated Time: 10 minutes
 
 ## Acknowledgements
 
-* **Source** - [Oracle DBMS_CLOUD_AI documentation](https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/adbsb/dbms-cloud-ai-package.html).
-* **Last Updated** - August 4, 2026
+- **Author** - Oracle Graph Product Management, Oracle
+- **Last Updated** - August 2026
