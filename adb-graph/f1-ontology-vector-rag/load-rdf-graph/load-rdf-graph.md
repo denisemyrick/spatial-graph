@@ -58,6 +58,8 @@ Estimated Time: 10 minutes
 
     RDF terms must use RDF syntax: IRIs are enclosed in angle brackets, and literals are enclosed in double quotes.
 
+    ![Database Actions query result showing RDF loader staging counts](images/rdf-loader-counts.png)
+
 ## Task 2: Load the semantic model
 
 1. Ensure that the `F1_2026_GRAPH` model and its semantic network already exist in your environment. Then bulk load the staging rows.
@@ -76,6 +78,8 @@ Estimated Time: 10 minutes
     ```
 
     Your RDF administrator may use a different model or network name. Oracle's RDF bulk-loading APIs require the `RDF$STC_SUB`, `RDF$STC_PRED`, and `RDF$STC_OBJ` staging columns.
+
+    ![Database Actions showing completion of the RDF bulk-load block](images/bulk-load-result.png)
 
 ## Task 3: Query the graph
 
@@ -108,6 +112,8 @@ Estimated Time: 10 minutes
     FROM "F1_NET#RDFT_F1_2026_GRAPH";
     ```
 
+    ![Database Actions query result showing 21 graph triples](images/graph-triple-count.png)
+
 2. Search the staging table for a named concept, such as DRS, and note its source provenance.
 
     ```sql
@@ -120,7 +126,9 @@ Estimated Time: 10 minutes
 
     A node being visible in the graph means that its triples were loaded. It does not, by itself, guarantee that a later vector retrieval step will select the node; that is why the next lab creates entity-focused retrieval records.
 
+    ![Database Actions showing the SEM_MATCH Java runtime error](images/sem-match-java-limitation.png)
+
 ## Acknowledgements
 
-* **Source** - [Loading and Exporting RDF Data](https://docs.oracle.com/en/database/oracle/oracle-database/26/rdfrm/loading-and-exporting-rdf-data.html).
-* **Last Updated** - August 4, 2026
+- **Source** - [Loading and Exporting RDF Data](https://docs.oracle.com/en/database/oracle/oracle-database/26/rdfrm/loading-and-exporting-rdf-data.html).
+- **Last Updated** - August 4, 2026

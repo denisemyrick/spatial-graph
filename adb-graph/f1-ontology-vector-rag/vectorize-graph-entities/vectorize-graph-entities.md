@@ -58,6 +58,8 @@ Estimated Time: 15 minutes
 
     The card is an RDF-focused retrieval unit. It is not a replacement for the graph; it gives vector search enough context to choose a useful graph neighborhood.
 
+    ![Database Actions query result showing the entity-card count](images/entity-card-count.png)
+
 ## Task 2: Generate entity-card embeddings
 
 1. Replace the profile name and generate one embedding per card.
@@ -78,6 +80,8 @@ Estimated Time: 15 minutes
 
     Use the same embedding profile for both stored cards and user questions. Embeddings from different models should not be compared.
 
+    ![Database Actions query result showing non-null vector embeddings](images/embedding-count.png)
+
 2. For a larger demo dataset, create a vector index after loading the embeddings.
 
     ```sql
@@ -88,6 +92,8 @@ Estimated Time: 15 minutes
     WITH TARGET ACCURACY 95
     DISTANCE COSINE;
     ```
+
+    ![Database Actions query result showing a VALID vector index](images/vector-index-status.png)
 
 ## Task 3: Inspect vector retrieval
 
@@ -114,6 +120,8 @@ Estimated Time: 15 minutes
     ```
 
     For a small graph, use a larger result count such as 15 or 20 to favor recall. In a large graph, add hybrid keyword-plus-vector retrieval and reranking.
+
+    ![Database Actions showing the nearest-neighbor runtime limitation](images/nearest-neighbor-limitation.png)
 
 ## Acknowledgements
 

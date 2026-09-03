@@ -77,6 +77,16 @@ variable "ociGenAiRegion" {
   default = ""
 }
 
+# Optional existing tenancy-level dynamic group. Set this when the tenancy has
+# reached its dynamic-group quota so the stack can reuse a pre-created group
+# instead of creating another one. The group's matching rule must include the
+# Autonomous Database created by this stack.
+variable "ociDynamicGroupName" {
+  type        = string
+  description = "Existing tenancy dynamic group to reuse for Autonomous Database GenAI access. Leave empty to create one."
+  default     = ""
+}
+
 # Additional standard LiveLabs inputs retained for reservation injection.
 variable "ociUserPassword" {
   type      = string
@@ -105,8 +115,15 @@ variable "resUserPublicKey" {
 }
 
 variable "f1_user_name" {
-  type    = string
-  default = "F1_ANALYST"
+  type        = string
+  description = "Oracle schema used by the F1 workshop labs and Graph Studio."
+  default     = "F1_ANALYST"
+}
+
+variable "enable_oracle_java" {
+  type        = bool
+  description = "Request Oracle JVM installation during ADMIN bootstrap. A database restart is required before SEM_MATCH can run."
+  default     = true
 }
 
 variable "genai_profile_name" {
@@ -160,12 +177,14 @@ locals {
   db_name        = "ATP${local.db_res_id}"
   db_service     = "${local.db_name}_high"
 
-  oci_compartment_ocid           = trimspace(var.ociCompartmentOcid) != "" ? var.ociCompartmentOcid : var.compartment_ocid
-  oci_region                     = trimspace(var.ociRegionIdentifier) != "" ? var.ociRegionIdentifier : var.region
-  genai_region                   = trimspace(var.ociGenAiRegion) != "" ? var.ociGenAiRegion : local.oci_region
-  home_region                    = trimspace(var.ociHomeRegionIdentifier) != "" ? var.ociHomeRegionIdentifier : try(var.home_tenancy_regions[var.ociTenancyOcid], local.oci_region)
-  oci_tenancy_ocid               = trimspace(var.ociTenancyOcid)
-  api_key_configured             = trimspace(var.ociTenancyOcid) != "" && trimspace(var.ociUserOcid) != ""
-  resource_principal_iam_enabled = !local.api_key_configured && local.oci_tenancy_ocid != ""
-  genai_credential_name          = local.api_key_configured ? "AI_CREDENTIAL" : "OCI$RESOURCE_PRINCIPAL"
+  oci_compartment_ocid            = trimspace(var.ociCompartmentOcid) != "" ? var.ociCompartmentOcid : var.compartment_ocid
+  oci_region                      = trimspace(var.ociRegionIdentifier) != "" ? var.ociRegionIdentifier : var.region
+  genai_region                    = trimspace(var.ociGenAiRegion) != "" ? var.ociGenAiRegion : local.oci_region
+  home_region                     = trimspace(var.ociHomeRegionIdentifier) != "" ? var.ociHomeRegionIdentifier : try(var.home_tenancy_regions[var.ociTenancyOcid], local.oci_region)
+  oci_tenancy_ocid                = trimspace(var.ociTenancyOcid)
+  api_key_configured              = trimspace(var.ociTenancyOcid) != "" && trimspace(var.ociUserOcid) != ""
+  existing_dynamic_group_name     = trimspace(var.ociDynamicGroupName)
+  resource_principal_iam_required = !local.api_key_configured && local.oci_tenancy_ocid != ""
+  resource_principal_iam_enabled  = local.resource_principal_iam_required && local.existing_dynamic_group_name == ""
+  genai_credential_name           = local.api_key_configured ? "AI_CREDENTIAL" : "OCI$RESOURCE_PRINCIPAL"
 }

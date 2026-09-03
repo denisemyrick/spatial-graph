@@ -115,6 +115,8 @@ Estimated Time: 10 minutes
     /
     ```
 
+    ![Database Actions query result showing the F1_ASK function status](images/f1-ask-status.png)
+
 ## Task 2: Test grounded answers
 
 1. Ask a question that the graph is expected to answer.
@@ -127,6 +129,8 @@ Estimated Time: 10 minutes
     FROM dual;
     ```
 
+    ![Database Actions result for the energy-mode grounded question](images/energy-question-result.png)
+
 2. Test a term or feature in the source graph.
 
     ```sql
@@ -137,6 +141,8 @@ Estimated Time: 10 minutes
     FROM dual;
     ```
 
+    ![Database Actions result for the DRS grounded question](images/drs-question-result.png)
+
 3. Test the missing-information behavior.
 
     ```sql
@@ -146,6 +152,8 @@ Estimated Time: 10 minutes
            ) AS answer
     FROM dual;
     ```
+
+    ![Database Actions result for the maximum-speed question](images/maximum-speed-question-result.png)
 
 ## Task 3: Inspect the graph context sent to the model
 
@@ -180,6 +188,8 @@ Estimated Time: 10 minutes
     ```
 
     This query makes the retrieval path explainable: question, vector-selected entities, connected RDF facts, and final answer. The function always sends RDF facts and the ontology to the chat model; it never sends source PDF chunks as answer context.
+
+    ![Database Actions showing the vector context-query runtime limitation](images/context-query-limitation.png)
 
 ## Learn More
 

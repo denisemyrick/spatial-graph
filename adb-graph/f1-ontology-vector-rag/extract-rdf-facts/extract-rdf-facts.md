@@ -41,6 +41,8 @@ Estimated Time: 15 minutes
     );
     ```
 
+    ![Database Actions showing the RDF extraction staging-table setup](images/staging-tables-created.png)
+
 ## Task 2: Extract facts with the ontology
 
 1. Run the following block after replacing `GENAI_PROFILE` with your chat profile. The ontology is deliberately included in the prompt so the model knows the permitted classes, predicates, inverse relationships, and aliases.
@@ -119,6 +121,8 @@ Estimated Time: 15 minutes
 
     Extend the ontology in this code block only with approved terms. Keep the text chunk outside the quoted ontology prompt and join it with `||`.
 
+    ![Database Actions query result showing valid raw extraction JSON rows](images/raw-json-validation.png)
+
 ## Task 3: Parse JSON into triple rows
 
 1. Convert the JSON array into one relational row per triple.
@@ -176,6 +180,8 @@ Estimated Time: 15 minutes
     FROM f1_rdf_triples_stg
     ORDER BY document_id, chunk_id, predicate;
     ```
+
+    ![Database Actions query result showing parsed RDF triple counts](images/triple-counts.png)
 
 ## Acknowledgements
 

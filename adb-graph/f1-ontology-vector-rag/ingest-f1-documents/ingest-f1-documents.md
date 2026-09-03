@@ -59,6 +59,12 @@ continue with the verification query.
     Reconnect as `F1_ANALYST` before continuing with the remaining tasks in
     this lab.
 
+    The later `SEM_MATCH` check should work when this prerequisite is active. If
+    the learner session returns the error shown below, use the direct graph-table
+    fallback documented in Lab 3 and have an administrator recheck Oracle JVM.
+
+    ![Database Actions showing the SEM_MATCH Java runtime limitation](images/sem-match-java-limitation.png)
+
 ## Task 2: Create document storage
 
 1. Create a table that stores each PDF once.
@@ -88,6 +94,8 @@ continue with the verification query.
 
     The composite primary key matters because chunk numbering restarts for each document. A chunk is identified by the pair `(document_id, chunk_id)`.
 
+    ![Database Actions query result showing the Lab 1 tables](images/tables-created.png)
+
 ## Task 3: Load the two PDFs
 
 1. Replace the PAR URL placeholders and run the inserts.
@@ -116,6 +124,8 @@ continue with the verification query.
     FROM f1_documents
     ORDER BY document_id;
     ```
+
+    ![Database Actions query result showing f1rules.pdf and f1text.pdf](images/documents-loaded.png)
 
 ## Task 4: Extract text and create chunks
 
@@ -167,8 +177,9 @@ continue with the verification query.
     ORDER BY d.document_name;
     ```
 
+    ![Database Actions query result showing chunk counts by document](images/chunk-counts.png)
+
 ## Acknowledgements
 
 - **Author** - Oracle Graph Product Management, Oracle
-- **Oracle Java** - [Use Oracle Java on Autonomous AI Database](https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/autonomous-oracle-java.html)
 - **Last Updated** - August 2026

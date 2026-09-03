@@ -23,6 +23,20 @@ The demo deliberately combines relational storage, AI extraction, RDF graph tech
 
 Estimated Workshop Time: 60 minutes
 
+## Task 1: Open the workshop environment
+
+1. Open the workshop in a browser and sign in to Graph Studio with the learner account.
+
+    ![Graph Studio landing page showing the signed-in learner environment](images/graphstudio-overview.png)
+
+2. Select **Graphs** from the left navigation, then select the **RDF Graph** tab.
+
+    ![Graph Studio Graphs page with the RDF Graph tab selected](images/rdf-graph-controls.png)
+
+3. Open Database Actions and select the **SQL** tile to run the workshop SQL.
+
+    ![Database Actions launchpad with the SQL entry point](images/database-actions-launchpad.png)
+
 ## Acknowledgements
 
 - **Author** - Oracle Graph Product Management, Oracle
