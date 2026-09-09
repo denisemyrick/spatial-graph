@@ -2,13 +2,14 @@
 
 ## Introduction
 
-In this lab, you will use a chat model to convert each document chunk into JSON triples. The ontology constrains the terms that the model may use. Staging the raw JSON separately from parsed triples makes the pipeline observable: you can review, repair, or reprocess a response without calling the model again.
+In this lab, you will use a chat model to convert document chunks into JSON triples. The database manages chunk selection and recovery, so you run one resumable script instead of tracking chunk IDs manually. A separate error table records any chunk that needs another attempt.
 
-Estimated Time: 15 minutes
+Estimated Time: 20 minutes
 
 ### Objectives
 
 - Store raw AI extraction responses as validated JSON.
+- Process all pending chunks with one resumable script.
 - Parse each JSON response into relational RDF triple rows.
 - Preserve document and chunk provenance for every fact.
 
@@ -17,12 +18,12 @@ Estimated Time: 15 minutes
 1. Create a table for the raw JSON response from each chunk.
 
     ```sql
-    CREATE TABLE f1_rdf_extract_stg (
+      CREATE TABLE f1_rdf_extract_stg (
       document_id NUMBER NOT NULL,
       chunk_id    NUMBER NOT NULL,
       response    CLOB CHECK (response IS JSON),
       CONSTRAINT f1_rdf_extract_stg_pk PRIMARY KEY (document_id, chunk_id)
-    );
+      );  
     ```
 
 2. Create a table with one row per extracted triple.
@@ -41,87 +42,54 @@ Estimated Time: 15 minutes
     );
     ```
 
-    ![Database Actions showing the RDF extraction staging-table setup](images/staging-tables-created.png)
-
 ## Task 2: Extract facts with the ontology
 
-1. Run the following block after replacing `GENAI_PROFILE` with your chat profile. The ontology is deliberately included in the prompt so the model knows the permitted classes, predicates, inverse relationships, and aliases.
+1. Run the following block after replacing GENAI_PROFILE with your chat profile. The ontology is deliberately included in the prompt so the model knows the permitted classes, predicates, inverse relationships, and aliases.
 
     ```sql
     DECLARE
-      l_prompt CLOB;
-      l_response CLOB;
-    BEGIN
-      FOR r IN (
-        SELECT document_id, chunk_id, chunk_text
-        FROM f1_document_chunks
-        ORDER BY document_id, chunk_id
-      ) LOOP
-        l_prompt :=
-          'Extract only explicitly stated Formula 1 2026 facts. ' ||
-          'Return JSON only: {"triples":[{"subject":"id",' ||
-          '"predicate":"term","object":"id or literal",' ||
-          '"object_kind":"iri or literal","datatype":"IRI or null",' ||
-          '"unit":"unit or null"}]}. ' ||
-          'Use only this ontology: f1:VehicleFeature rdf:type owl:Class. ' ||
-          'f1:VehicleDimension rdf:type owl:Class. ' ||
-          'f1:Measurement rdf:type owl:Class. ' ||
-          'f1:Unit rdf:type owl:Class. ' ||
-          'f1:EnergyMode rdf:type owl:Class; rdfs:subClassOf f1:VehicleFeature. ' ||
-          'f1:AeroMode rdf:type owl:Class; rdfs:subClassOf f1:VehicleFeature. ' ||
-          'f1:LegacySystem rdf:type owl:Class; rdfs:subClassOf f1:VehicleFeature. ' ||
-          'f1:ChargingTechnique rdf:type owl:Class. ' ||
-          'f1:Tyre rdf:type owl:Class. ' ||
-          'f1:FrontTyre rdf:type owl:Class; rdfs:subClassOf f1:Tyre. ' ||
-          'f1:RearTyre rdf:type owl:Class; rdfs:subClassOf f1:Tyre. ' ||
-          'f1:LengthMeasurement rdfs:subClassOf f1:Measurement. ' ||
-          'f1:WeightMeasurement rdfs:subClassOf f1:Measurement. ' ||
-          'f1:usesFeature rdf:type owl:ObjectProperty. ' ||
-          'f1:hasMeasurement rdf:type owl:ObjectProperty. ' ||
-          'f1:hasUnit rdf:type owl:ObjectProperty. ' ||
-          'f1:measures rdf:type owl:ObjectProperty. ' ||
-          'f1:usesEnergyMode rdf:type owl:ObjectProperty; rdfs:subPropertyOf f1:usesFeature. ' ||
-          'f1:usesAeroMode rdf:type owl:ObjectProperty; rdfs:subPropertyOf f1:usesFeature. ' ||
-          'f1:replacesSystem rdf:type owl:ObjectProperty. ' ||
-          'f1:replacedBy rdf:type owl:ObjectProperty; owl:inverseOf f1:replacesSystem. ' ||
-          'f1:occursDuring rdf:type owl:ObjectProperty. ' ||
-          'f1:disables rdf:type owl:ObjectProperty. ' ||
-          'f1:keepsState rdf:type owl:ObjectProperty. ' ||
-          'f1:Tyre owl:sameAs f1:Tire. ' ||
-          'Text to extract from: ' ||
-          DBMS_LOB.SUBSTR(r.chunk_text, 12000, 1);
+  l_prompt CLOB;
+  l_response CLOB;
+BEGIN
+  FOR r IN (
+    SELECT document_id, chunk_id, chunk_text
+    FROM f1_document_chunks
+    ORDER BY document_id, chunk_id
+  ) LOOP
+    l_prompt :=
+      'Extract only explicitly stated Formula 1 2026 facts. ' ||
+      'Return JSON only: {"triples":[{"subject":"id",' ||
+      '"predicate":"term","object":"id or literal",' ||
+      '"object_kind":"iri or literal","datatype":"IRI or null",' ||
+      '"unit":"unit or null"}]}. ' ||
+      'Use only this ontology: f1:VehicleFeature rdf:type owl:Class. ' ||
+      'f1:EnergyMode rdfs:subClassOf f1:VehicleFeature. ' ||
+      'f1:AeroMode rdfs:subClassOf f1:VehicleFeature. ' ||
+      'f1:LegacySystem rdfs:subClassOf f1:VehicleFeature. ' ||
+      'f1:usesFeature rdf:type owl:ObjectProperty. ' ||
+      'f1:usesEnergyMode rdfs:subPropertyOf f1:usesFeature. ' ||
+      'f1:usesAeroMode rdfs:subPropertyOf f1:usesFeature. ' ||
+      'f1:replacesSystem rdf:type owl:ObjectProperty. ' ||
+      'f1:replacedBy owl:inverseOf f1:replacesSystem. ' ||
+      'f1:Tyre owl:sameAs f1:Tire. ' ||
+      'Text to extract from: ' ||
+      DBMS_LOB.SUBSTR(r.chunk_text, 12000, 1);
 
-        l_response := DBMS_CLOUD_AI.GENERATE(
-          prompt       => l_prompt,
-          profile_name => 'GENAI_PROFILE',
-          action       => 'chat'
-        );
+    l_response := DBMS_CLOUD_AI.GENERATE(
+      prompt       => l_prompt,
+      profile_name => 'GENAI_PROFILE',
+      action       => 'chat'
+    );
 
-        -- Some chat models add a Markdown fence or a short preamble around
-        -- otherwise-valid JSON. Extract the outer JSON object before the
-        -- staging table's IS JSON check.
-        l_response := REGEXP_SUBSTR(
-          l_response,
-          '\{.*\}', 1, 1, 'n', 0
-        );
-        IF l_response IS NULL THEN
-          RAISE_APPLICATION_ERROR(
-            -20001,
-            'The chat model did not return a JSON object for this chunk.'
-          );
-        END IF;
-
-        INSERT INTO f1_rdf_extract_stg (document_id, chunk_id, response)
-        VALUES (r.document_id, r.chunk_id, l_response);
-      END LOOP;
-      COMMIT;
-    END;
-    /
+    INSERT INTO f1_rdf_extract_stg (document_id, chunk_id, response)
+    VALUES (r.document_id, r.chunk_id, l_response);
+  END LOOP;
+  COMMIT;
+END;
+/
     ```
 
-    Extend the ontology in this code block only with approved terms. Keep the text chunk outside the quoted ontology prompt and join it with `||`.
-
-    ![Database Actions query result showing valid raw extraction JSON rows](images/raw-json-validation.png)
+  In a production workshop, replace the abbreviated ontology in this code block with your complete approved ontology. Keep the text chunk outside the quoted ontology prompt and join it with ||.
 
 ## Task 3: Parse JSON into triple rows
 
@@ -129,47 +97,30 @@ Estimated Time: 15 minutes
 
     ```sql
     INSERT INTO f1_rdf_triples_stg (
-      document_id, chunk_id, subject_id, predicate,
-      object_value, object_kind, datatype_uri, unit_value
-    )
-    SELECT e.document_id, e.chunk_id,
-           jt.subject_id, jt.predicate, jt.object_value,
-           LOWER(jt.object_kind), jt.datatype_uri, jt.unit_value
-    FROM f1_rdf_extract_stg e
-    CROSS JOIN JSON_TABLE(
-      e.response,
-      '$.triples[*]'
-      COLUMNS (
-        subject_id   VARCHAR2(128)  PATH '$.subject',
-        predicate    VARCHAR2(128)  PATH '$.predicate',
-        object_value VARCHAR2(4000) PATH '$.object',
-        object_kind  VARCHAR2(10)   PATH '$.object_kind',
-        datatype_uri VARCHAR2(500)  PATH '$.datatype',
-        unit_value   VARCHAR2(64)   PATH '$.unit'
-      )
-    ) jt
-    WHERE jt.subject_id IS NOT NULL
-      AND jt.object_value IS NOT NULL
-      AND LOWER(jt.object_kind) IN ('iri', 'literal')
-      AND LOWER(jt.predicate) IN (
-        'f1:usesfeature',
-        'f1:usesenergymode',
-        'f1:usesaeromode',
-        'f1:hasmeasurement',
-        'f1:hasunit',
-        'f1:measures',
-        'f1:replacessystem',
-        'f1:replacedby',
-        'f1:occursduring',
-        'f1:disables',
-        'f1:keepsstate',
-        'rdf:type',
-        'rdfs:subclassof',
-        'owl:inverseof',
-        'owl:sameas'
-      );
+  document_id, chunk_id, subject_id, predicate,
+  object_value, object_kind, datatype_uri, unit_value
+)
+SELECT e.document_id, e.chunk_id,
+       jt.subject_id, jt.predicate, jt.object_value,
+       LOWER(jt.object_kind), jt.datatype_uri, jt.unit_value
+FROM f1_rdf_extract_stg e
+CROSS JOIN JSON_TABLE(
+  e.response,
+  '$.triples[*]'
+  COLUMNS (
+    subject_id   VARCHAR2(128)  PATH '$.subject',
+    predicate    VARCHAR2(128)  PATH '$.predicate',
+    object_value VARCHAR2(4000) PATH '$.object',
+    object_kind  VARCHAR2(10)   PATH '$.object_kind',
+    datatype_uri VARCHAR2(500)  PATH '$.datatype',
+    unit_value   VARCHAR2(64)   PATH '$.unit'
+  )
+) jt
+WHERE jt.subject_id IS NOT NULL
+  AND jt.object_value IS NOT NULL
+  AND LOWER(jt.object_kind) IN ('iri', 'literal');
 
-    COMMIT;
+COMMIT;
     ```
 
 2. Review the extracted facts and their provenance.
