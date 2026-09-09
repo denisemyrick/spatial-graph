@@ -60,7 +60,6 @@ resource "local_file" "create_f1_user" {
     user_password      = local.admin_password
     genai_host         = "inference.generativeai.${local.genai_region}.oci.oraclecloud.com"
     api_key_configured = local.api_key_configured
-    enable_oracle_java = var.enable_oracle_java
   })
 }
 
@@ -68,7 +67,6 @@ resource "null_resource" "create_f1_user" {
   triggers = {
     autonomous_database_id = oci_database_autonomous_database.f1_lakehouse.id
     f1_user_name           = upper(var.f1_user_name)
-    bootstrap_sha256       = local_file.create_f1_user.content_sha256
   }
 
   provisioner "local-exec" {
@@ -98,7 +96,6 @@ resource "null_resource" "create_f1_graph" {
     f1_user_name           = upper(var.f1_user_name)
     network_name           = "F1_NET"
     graph_name             = "F1_2026_GRAPH"
-    bootstrap_sha256       = local_file.create_f1_graph.content_sha256
   }
 
   provisioner "local-exec" {
@@ -149,8 +146,4 @@ output "graph_studio_url" {
 
 output "apex_url" {
   value = [oci_database_autonomous_database.f1_lakehouse.connection_urls[0].apex_url]
-}
-
-output "oracle_java_next_step" {
-  value = var.enable_oracle_java ? "Oracle JVM enablement was requested during bootstrap. Restart the Autonomous Database once after apply, then wait for DBA_REGISTRY.JAVAVM to show VALID before running SEM_MATCH." : "Oracle JVM enablement was disabled. Enable JAVAVM and restart the Autonomous Database before running SEM_MATCH."
 }

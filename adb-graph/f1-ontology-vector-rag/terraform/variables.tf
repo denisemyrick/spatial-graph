@@ -115,15 +115,8 @@ variable "resUserPublicKey" {
 }
 
 variable "f1_user_name" {
-  type        = string
-  description = "Oracle schema used by the F1 workshop labs and Graph Studio."
-  default     = "F1_ANALYST"
-}
-
-variable "enable_oracle_java" {
-  type        = bool
-  description = "Request Oracle JVM installation during ADMIN bootstrap. A database restart is required before SEM_MATCH can run."
-  default     = true
+  type    = string
+  default = "F1_ANALYST"
 }
 
 variable "genai_profile_name" {

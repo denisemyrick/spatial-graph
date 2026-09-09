@@ -4,7 +4,7 @@
 
 Formula 1 technical rules are rich in relationships: a system can replace another system, a feature can have a measurement, and two terms can be aliases. In this workshop, you will turn two F1 PDF documents into an ontology-aligned RDF graph, add vector retrieval over graph entities, and ask grounded questions in natural language.
 
-The demo deliberately combines relational storage, AI extraction, RDF graph technology, vector search, and generative AI in one Oracle AI Database workflow. A single question-answering function uses vectors to identify a graph neighborhood. RDF facts and the ontology provide the evidence and meaning used to answer the question.
+The workshop combines relational storage, AI extraction, RDF graph technology, vector search, and generative AI in one Oracle AI Database workflow. A single question-answering function uses vectors to identify a graph neighborhood. RDF facts and the ontology provide the evidence and meaning used to answer questions.
 
 ### Prerequisites
 
@@ -22,20 +22,6 @@ The demo deliberately combines relational storage, AI extraction, RDF graph tech
 - Answer questions using the ontology and the relevant RDF graph facts.
 
 Estimated Workshop Time: 60 minutes
-
-## Task 1: Open the workshop environment
-
-1. Open the workshop in a browser and sign in to Graph Studio with the learner account.
-
-    ![Graph Studio landing page showing the signed-in learner environment](images/graphstudio-overview.png)
-
-2. Select **Graphs** from the left navigation, then select the **RDF Graph** tab.
-
-    ![Graph Studio Graphs page with the RDF Graph tab selected](images/rdf-graph-controls.png)
-
-3. Open Database Actions and select the **SQL** tile to run the workshop SQL.
-
-    ![Database Actions launchpad with the SQL entry point](images/database-actions-launchpad.png)
 
 ## Acknowledgements
 

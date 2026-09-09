@@ -33,49 +33,6 @@ GRANT CREATE VIEW TO ${f1_user_name};
 GRANT UNLIMITED TABLESPACE TO ${f1_user_name};
 ALTER USER ${f1_user_name} QUOTA UNLIMITED ON DATA;
 
--- Graph Studio requires the graph developer role, proxy authentication, and
--- an ORDS schema mapping for the learner account. These statements are
--- intentionally part of the ADMIN bootstrap so a new stack is usable without
--- a separate manual Graph Studio setup step.
-GRANT GRAPH_DEVELOPER TO ${f1_user_name};
-ALTER USER ${f1_user_name} GRANT CONNECT THROUGH "GRAPH$PROXY_USER";
-
-BEGIN
-  ORDS.ENABLE_SCHEMA(
-    p_enabled             => TRUE,
-    p_schema              => '${f1_user_name}',
-    p_url_mapping_type    => 'BASE_PATH',
-    p_url_mapping_pattern => '${f1_user_name}',
-    p_auto_rest_auth      => FALSE
-  );
-  COMMIT;
-END;
-/
-
-%{ if enable_oracle_java ~}
--- SEM_MATCH uses the Oracle JVM. ADB installs the feature asynchronously and
--- requires one database restart before the component becomes VALID.
-DECLARE
-  l_java_status dba_registry.status%TYPE;
-BEGIN
-  BEGIN
-    SELECT status
-      INTO l_java_status
-      FROM dba_registry
-     WHERE comp_id = 'JAVAVM';
-  EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-      l_java_status := NULL;
-  END;
-
-  IF l_java_status IS NULL OR l_java_status NOT IN ('VALID', 'LOADING') THEN
-    DBMS_CLOUD_ADMIN.ENABLE_FEATURE(feature_name => 'JAVAVM');
-  END IF;
-END;
-/
-PROMPT Oracle JVM enablement was requested. Restart the Autonomous Database once after this bootstrap and wait for JAVAVM to become VALID.
-%{ endif ~}
-
 -- SQL/PLSQL document pipeline.
 GRANT EXECUTE ON DBMS_VECTOR_CHAIN TO ${f1_user_name};
 GRANT EXECUTE ON DBMS_CLOUD_AI TO ${f1_user_name};

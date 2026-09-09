@@ -13,9 +13,23 @@ Estimated Time: 15 minutes
 - Verify text extraction.
 - Create overlapping chunks for every loaded document.
 
-## Task 1: Enable Oracle JVM for RDF queries
+## Task 1: Log into SQL Worksheet
 
-`SEM_MATCH`, used in Lab 3, requires Oracle JVM on Autonomous Database. If
+1. Click the **Navigation Menu** in the upper left, navigate to **Oracle AI Database**, and select **Autonomous AI Database**.
+
+    ![Navigating to Autonomous AI Database.](images/navigation-menu-v1.png " ")
+
+2. Select the compartment provided on **View Login Info**, and click on the **Display Name** for the **Autonomous AI Database**.
+
+    ![Selecting Autonomous Database in the Navigation Menu.](images/select-autonmous-database-v4.png " ")
+
+3. In your Autonomous AI Database details page, click the **Database Actions** dropdown and then choose SQL.
+
+    ![Click Database Actions button.](./images/database-actions-sql.png " ")
+
+## Task 2: Enable Oracle JVM for RDF queries
+
+`SEM_MATCH`, used in Lab 3, requires Oracle JVM on Autonomous AI Database. If
 your database already reports `JAVAVM` as `VALID`, skip the enable command and
 continue with the verification query.
 
@@ -33,11 +47,11 @@ continue with the verification query.
     /
     ```
 
-3. Restart the Autonomous Database from the OCI Console. The restart is
+3. Restart the Autonomous AI Database from the OCI Console. The restart is
    required for the installation to proceed. Enabling Oracle JVM is permanent
    for this database.
 
-4. After the database is available, remain connected as `ADMIN` and verify
+4. After the database is available, reconnect as `ADMIN` and verify
    the component status.
 
     ```sql
@@ -65,7 +79,7 @@ continue with the verification query.
 
     ![Database Actions showing the SEM_MATCH Java runtime limitation](images/sem-match-java-limitation.png)
 
-## Task 2: Create document storage
+## Task 3: Create document storage
 
 1. Create a table that stores each PDF once.
 
@@ -96,7 +110,7 @@ continue with the verification query.
 
     ![Database Actions query result showing the Lab 1 tables](images/tables-created.png)
 
-## Task 3: Load the two PDFs
+## Task 4: Load the two PDFs
 
 1. Replace the PAR URL placeholders and run the inserts.
 
@@ -104,13 +118,13 @@ continue with the verification query.
     INSERT INTO f1_documents (document_name, document_blob)
     VALUES ('f1text.pdf', DBMS_CLOUD.GET_OBJECT(
       credential_name => NULL,
-      object_uri => '<read-only-PAR-URL-for-f1text.pdf>'
+      object_uri => 'https://objectstorage.ap-tokyo-1.oraclecloud.com/p/m-5x3GUB4MMlShgvHZyel-wVglrY3Q1yWyUD1iWHbVrcvjeC7WRLpKCNsO3ywyVx/n/oradbclouducm/b/ai_world27/o/2026-f1-regulations-expanded-article.pdf'
     ));
 
     INSERT INTO f1_documents (document_name, document_blob)
     VALUES ('f1rules.pdf', DBMS_CLOUD.GET_OBJECT(
       credential_name => NULL,
-      object_uri => '<read-only-PAR-URL-for-f1rules.pdf>'
+      object_uri => 'https://objectstorage.ap-tokyo-1.oraclecloud.com/p/8is_zVAvPAzUGb1UMfJ7bResRjHCRbEfPlgX9j2vGWxSt0vJIz-dahv_79c0mnqQ/n/oradbclouducm/b/ai_world27/o/FIA%202026%20F1%20Regulations%20-%20Section%20C.pdf'
     ));
 
     COMMIT;
@@ -127,7 +141,7 @@ continue with the verification query.
 
     ![Database Actions query result showing f1rules.pdf and f1text.pdf](images/documents-loaded.png)
 
-## Task 4: Extract text and create chunks
+## Task 5: Extract text and create chunks
 
 1. Preview the first 1,000 characters from every PDF.
 
@@ -178,6 +192,40 @@ continue with the verification query.
     ```
 
     ![Database Actions query result showing chunk counts by document](images/chunk-counts.png)
+
+<!--## Task 1: Log into Graph Studio
+
+1. Click the **Navigation Menu** in the upper left, navigate to **Oracle AI Database**, and select **Autonomous AI Database**.
+
+    ![Navigating to Autonomous AI Database.](images/navigation-menu-v1.png " ")
+
+2. Select the compartment provided on **View Login Info**, and click on the **Display Name** for the **Autonomous AI Database**.
+
+    ![Selecting Autonomous Database in the Navigation Menu.](images/select-autonmous-database-v4.png " ")
+
+3. In your Autonomous AI Database details page, click the **Database Actions** dropdown and then choose View all database actions.
+
+    ![Click Database Actions button.](./images/database-action-sql-v4.png " ")
+
+4. The Database Actions page opens. In the **Development** box, click **Graph Studio**.
+
+    ![Click Graph Studio.](./images/dbactions-click-graph-studio.png " ")
+
+    Login using the following credentials:
+    
+    **Username:** F1_ANALYST
+    **Password:** 
+
+    ![Click Graph Studio.](./images/graph-studio-signin.png " ")
+
+  Graph Studio will open to the landing page.
+
+    ![Graph Studio landing page showing the signed-in learner environment](./images/graphstudio-overview.png " ")
+
+5. Select **Graphs** from the hamburger menu, then select the **RDF Graph** tab.
+
+    ![Graph Studio Graphs page with the RDF Graph tab selected](images/rdf-graph-controls.png)
+    -->
 
 ## Acknowledgements
 
