@@ -20,102 +20,102 @@ Estimated Time: 10 minutes
 
     ```sql
     CREATE OR REPLACE FUNCTION f1_ask (
-      p_question IN VARCHAR2
-    ) RETURN CLOB
-    AUTHID DEFINER
-    AS
-      l_ontology    CLOB;
-      l_graph_facts CLOB;
-    BEGIN
-      l_ontology := TO_CLOB(
-    'f1:VehicleFeature rdf:type owl:Class .
-    f1:VehicleDimension rdf:type owl:Class .
-    f1:Measurement rdf:type owl:Class .
-    f1:Unit rdf:type owl:Class .
-    f1:EnergyMode rdf:type owl:Class ; rdfs:subClassOf f1:VehicleFeature .
-    f1:AeroMode rdf:type owl:Class ; rdfs:subClassOf f1:VehicleFeature .
-    f1:LegacySystem rdf:type owl:Class ; rdfs:subClassOf f1:VehicleFeature .
-    f1:ChargingTechnique rdf:type owl:Class .
-    f1:Tyre rdf:type owl:Class .
-    f1:FrontTyre rdf:type owl:Class ; rdfs:subClassOf f1:Tyre .
-    f1:RearTyre rdf:type owl:Class ; rdfs:subClassOf f1:Tyre .
-    f1:LengthMeasurement rdfs:subClassOf f1:Measurement .
-    f1:WeightMeasurement rdfs:subClassOf f1:Measurement .
-    f1:usesFeature rdf:type owl:ObjectProperty .
-    f1:hasMeasurement rdf:type owl:ObjectProperty .
-    f1:hasUnit rdf:type owl:ObjectProperty .
-    f1:measures rdf:type owl:ObjectProperty .
-    f1:usesEnergyMode rdf:type owl:ObjectProperty ;
-        rdfs:subPropertyOf f1:usesFeature .
-    f1:usesAeroMode rdf:type owl:ObjectProperty ;
-        rdfs:subPropertyOf f1:usesFeature .
-    f1:replacesSystem rdf:type owl:ObjectProperty .
-    f1:replacedBy rdf:type owl:ObjectProperty ;
-        owl:inverseOf f1:replacesSystem .
-    f1:occursDuring rdf:type owl:ObjectProperty .
-    f1:disables rdf:type owl:ObjectProperty .
-    f1:keepsState rdf:type owl:ObjectProperty .
-    f1:Tyre owl:sameAs f1:Tire .'
-      );
+  p_question IN VARCHAR2
+) RETURN CLOB
+AUTHID DEFINER
+AS
+  l_ontology    CLOB;
+  l_graph_facts CLOB;
+BEGIN
+  l_ontology := TO_CLOB(
+'f1:VehicleFeature rdf:type owl:Class .
+f1:VehicleDimension rdf:type owl:Class .
+f1:Measurement rdf:type owl:Class .
+f1:Unit rdf:type owl:Class .
+f1:EnergyMode rdf:type owl:Class ; rdfs:subClassOf f1:VehicleFeature .
+f1:AeroMode rdf:type owl:Class ; rdfs:subClassOf f1:VehicleFeature .
+f1:LegacySystem rdf:type owl:Class ; rdfs:subClassOf f1:VehicleFeature .
+f1:ChargingTechnique rdf:type owl:Class .
+f1:Tyre rdf:type owl:Class .
+f1:FrontTyre rdf:type owl:Class ; rdfs:subClassOf f1:Tyre .
+f1:RearTyre rdf:type owl:Class ; rdfs:subClassOf f1:Tyre .
+f1:LengthMeasurement rdfs:subClassOf f1:Measurement .
+f1:WeightMeasurement rdfs:subClassOf f1:Measurement .
+f1:usesFeature rdf:type owl:ObjectProperty .
+f1:hasMeasurement rdf:type owl:ObjectProperty .
+f1:hasUnit rdf:type owl:ObjectProperty .
+f1:measures rdf:type owl:ObjectProperty .
+f1:usesEnergyMode rdf:type owl:ObjectProperty ;
+    rdfs:subPropertyOf f1:usesFeature .
+f1:usesAeroMode rdf:type owl:ObjectProperty ;
+    rdfs:subPropertyOf f1:usesFeature .
+f1:replacesSystem rdf:type owl:ObjectProperty .
+f1:replacedBy rdf:type owl:ObjectProperty ;
+    owl:inverseOf f1:replacesSystem .
+f1:occursDuring rdf:type owl:ObjectProperty .
+f1:disables rdf:type owl:ObjectProperty .
+f1:keepsState rdf:type owl:ObjectProperty .
+f1:Tyre owl:sameAs f1:Tire .'
+  );
 
-      WITH
-        question_vector AS (
-          SELECT TO_VECTOR(
-                   DBMS_CLOUD_AI.GENERATE(
-                     prompt       => p_question,
-                     profile_name => 'F1_EMBED_PROFILE',
-                     action       => 'embedding'
-                   )
-                 ) AS embedding
-          FROM dual
-        ),
-        relevant_entities AS (
-          SELECT c.entity_term
-          FROM f1_graph_entity_cards c
-          CROSS JOIN question_vector q
-          ORDER BY VECTOR_DISTANCE(c.embedding, q.embedding, COSINE)
-          FETCH FIRST 15 ROWS ONLY
-        ),
-        relevant_triples AS (
-          SELECT DISTINCT r.RDF$STC_SUB, r.RDF$STC_PRED, r.RDF$STC_OBJ
-          FROM f1_rdf_load_stg r
-          JOIN relevant_entities e
-            ON r.RDF$STC_SUB = e.entity_term
-            OR r.RDF$STC_OBJ = e.entity_term
-        )
-      SELECT XMLCAST(
-               XMLAGG(
-                 XMLELEMENT(
-                   e,
-                   RDF$STC_SUB || ' ' || RDF$STC_PRED || ' ' ||
-                   RDF$STC_OBJ || ' .' || CHR(10)
-                 )
-                 ORDER BY RDF$STC_PRED, RDF$STC_OBJ
-               ).EXTRACT('//text()') AS CLOB
+  WITH
+    question_vector AS (
+      SELECT TO_VECTOR(
+               DBMS_CLOUD_AI.GENERATE(
+                 prompt       => p_question,
+                 profile_name => 'F1_EMBED_PROFILE',
+                 action       => 'embedding'
+               )
+             ) AS embedding
+      FROM dual
+    ),
+    relevant_entities AS (
+      SELECT c.entity_term
+      FROM f1_graph_entity_cards c
+      CROSS JOIN question_vector q
+      ORDER BY VECTOR_DISTANCE(c.embedding, q.embedding, COSINE)
+      FETCH FIRST 15 ROWS ONLY
+    ),
+    relevant_triples AS (
+      SELECT DISTINCT r.RDF$STC_SUB, r.RDF$STC_PRED, r.RDF$STC_OBJ
+      FROM f1_rdf_load_stg r
+      JOIN relevant_entities e
+        ON r.RDF$STC_SUB = e.entity_term
+        OR r.RDF$STC_OBJ = e.entity_term
+    )
+  SELECT XMLCAST(
+           XMLAGG(
+             XMLELEMENT(
+               e,
+               RDF$STC_SUB || ' ' || RDF$STC_PRED || ' ' ||
+               RDF$STC_OBJ || ' .' || CHR(10)
              )
-      INTO l_graph_facts
-      FROM relevant_triples;
+             ORDER BY RDF$STC_PRED, RDF$STC_OBJ
+           ).EXTRACT('//text()') AS CLOB
+         )
+  INTO l_graph_facts
+  FROM relevant_triples;
 
-      RETURN DBMS_CLOUD_AI.GENERATE(
-        prompt => TO_CLOB(
-          'Answer using only the ontology and RDF graph facts below. ' ||
-          'The ontology defines the meaning of classes, aliases, and relationships. ' ||
-          'The RDF graph facts are evidence for claims about Formula 1 2026. ' ||
-          'Use inverse relationships correctly. Do not use outside knowledge. ' ||
-          'If the supplied facts do not support an answer, say CANNOT DETERMINE.' ||
-          CHR(10) || CHR(10) || 'ONTOLOGY:' || CHR(10)
-        ) || l_ontology || TO_CLOB(
-          CHR(10) || CHR(10) || 'RELEVANT RDF GRAPH FACTS:' || CHR(10)
-        ) || NVL(l_graph_facts, 'No relevant RDF graph facts were found.') ||
-        TO_CLOB(CHR(10) || CHR(10) || 'USER QUESTION: ' || p_question),
-        profile_name => 'GENAI_PROFILE',
-        action       => 'chat'
-      );
-    END;
-    /
+  RETURN DBMS_CLOUD_AI.GENERATE(
+    prompt => TO_CLOB(
+      'Answer using only the ontology and RDF graph facts below. ' ||
+      'The ontology defines the meaning of classes, aliases, and relationships. ' ||
+      'The RDF graph facts are evidence for claims about Formula 1 2026. ' ||
+      'Use inverse relationships correctly. Do not use outside knowledge. ' ||
+      'If the supplied facts do not support an answer, say CANNOT DETERMINE.' ||
+      CHR(10) || CHR(10) || 'ONTOLOGY:' || CHR(10)
+    ) || l_ontology || TO_CLOB(
+      CHR(10) || CHR(10) || 'RELEVANT RDF GRAPH FACTS:' || CHR(10)
+    ) || NVL(l_graph_facts, 'No relevant RDF graph facts were found.') ||
+    TO_CLOB(CHR(10) || CHR(10) || 'USER QUESTION: ' || p_question),
+    profile_name => 'GENAI_PROFILE',
+    action       => 'chat'
+  );
+END;
+/
     ```
 
-    ![Database Actions query result showing the F1_ASK function status](images/f1-ask-status.png)
+  ![Database Actions query result showing the F1_ASK function status](images/f1-ask-status.png)
 
 ## Task 2: Test grounded answers
 

@@ -51,6 +51,9 @@ continue with the verification query.
    required for the installation to proceed. Enabling Oracle JVM is permanent
    for this database.
 
+    ![Restart database.](./images/database-restart.png " ")
+
+
 4. After the database is available, reconnect as `ADMIN` and verify
    the component status.
 
