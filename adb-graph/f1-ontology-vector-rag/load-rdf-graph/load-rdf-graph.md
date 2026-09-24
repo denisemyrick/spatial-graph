@@ -17,6 +17,11 @@ Estimated Time: 10 minutes
 1. Create the staging table. The four `RDF$STC_*` columns have the names expected by the RDF bulk-loading APIs; the first two columns are your provenance fields.
 
     ```sql
+    SELECT document_id, chunk_id, subject_id, predicate,
+       object_value, object_kind
+    FROM f1_rdf_triples_stg
+    ORDER BY document_id, chunk_id, predicate;
+
     CREATE TABLE f1_rdf_load_stg (
       source_document_id NUMBER,
       source_chunk_id    NUMBER,
@@ -31,29 +36,29 @@ Estimated Time: 10 minutes
 
     ```sql
     INSERT INTO f1_rdf_load_stg (
-      source_document_id, source_chunk_id,
-      RDF$STC_SUB, RDF$STC_PRED, RDF$STC_OBJ, RDF$STC_GRAPH
-    )
-    SELECT document_id,
-           chunk_id,
+  source_document_id, source_chunk_id,
+  RDF$STC_SUB, RDF$STC_PRED, RDF$STC_OBJ, RDF$STC_GRAPH
+)
+SELECT document_id,
+       chunk_id,
+       '<https://example.com/f1/' ||
+         SUBSTR(subject_id, INSTR(subject_id, ':') + 1) || '>',
+       '<https://example.com/f1/' ||
+         SUBSTR(predicate, INSTR(predicate, ':') + 1) || '>',
+       CASE
+         WHEN object_kind = 'iri' THEN
            '<https://example.com/f1/' ||
-             REPLACE(SUBSTR(subject_id, INSTR(subject_id, ':') + 1), ' ', '%20') || '>',
-           '<https://example.com/f1/' ||
-             REPLACE(SUBSTR(predicate, INSTR(predicate, ':') + 1), ' ', '%20') || '>',
-           CASE
-             WHEN object_kind = 'iri' THEN
-               '<https://example.com/f1/' ||
-                 REPLACE(SUBSTR(object_value, INSTR(object_value, ':') + 1), ' ', '%20') || '>'
-             WHEN datatype_uri IS NOT NULL THEN
-               '"' || REPLACE(object_value, '"', '\\"') ||
-                 '"^^<' || datatype_uri || '>'
-             ELSE
-               '"' || REPLACE(object_value, '"', '\\"') || '"'
-           END,
-           '<https://example.com/graph/f1-2026>'
-    FROM f1_rdf_triples_stg;
+             SUBSTR(object_value, INSTR(object_value, ':') + 1) || '>'
+         WHEN datatype_uri IS NOT NULL THEN
+           '"' || REPLACE(object_value, '"', '\\"') ||
+             '"^^<' || datatype_uri || '>'
+         ELSE
+           '"' || REPLACE(object_value, '"', '\\"') || '"'
+       END,
+       '<https://example.com/graph/f1-2026>'
+FROM f1_rdf_triples_stg;
 
-    COMMIT;
+COMMIT;
     ```
 
     RDF terms must use RDF syntax: IRIs are enclosed in angle brackets, and literals are enclosed in double quotes.
@@ -71,7 +76,7 @@ Estimated Time: 10 minutes
         table_owner   => USER,
         table_name    => 'F1_RDF_LOAD_STG',
         network_owner => 'F1_ANALYST',
-        network_name  => 'F1_NET'
+        network_name  => 'RDF_NETWORK'
       );
     END;
     /
@@ -97,7 +102,7 @@ Estimated Time: 10 minutes
         'PLUS_RDFT=VC',
         NULL, NULL,
         'F1_ANALYST',
-        'F1_NET'
+        'RDF_NETWORK'
       )
     )
     FETCH FIRST 25 ROWS ONLY;
@@ -109,7 +114,7 @@ Estimated Time: 10 minutes
 
     ```sql
     SELECT COUNT(*) AS graph_triples
-    FROM "F1_NET#RDFT_F1_2026_GRAPH";
+    FROM "RDF_NETWORK#RDFT_F1_2026_GRAPH";
     ```
 
     ![Database Actions query result showing 21 graph triples](images/graph-triple-count.png)
@@ -127,6 +132,10 @@ Estimated Time: 10 minutes
     A node being visible in the graph means that its triples were loaded. It does not, by itself, guarantee that a later vector retrieval step will select the node; that is why the next lab creates entity-focused retrieval records.
 
     ![Database Actions showing the SEM_MATCH Java runtime error](images/sem-match-java-limitation.png)
+
+## Task 4: Visualize the Graph in Graph Studio
+
+<!-- add steps here about how to log into graph studio !-->
 
 ## Acknowledgements
 

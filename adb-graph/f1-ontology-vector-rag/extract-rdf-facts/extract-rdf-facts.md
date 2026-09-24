@@ -18,12 +18,12 @@ Estimated Time: 20 minutes
 1. Create a table for the raw JSON response from each chunk.
 
     ```sql
-      CREATE TABLE f1_rdf_extract_stg (
+    CREATE TABLE f1_rdf_extract_stg (
       document_id NUMBER NOT NULL,
       chunk_id    NUMBER NOT NULL,
       response    CLOB CHECK (response IS JSON),
       CONSTRAINT f1_rdf_extract_stg_pk PRIMARY KEY (document_id, chunk_id)
-      );  
+      );
     ```
 
 2. Create a table with one row per extracted triple.
@@ -37,7 +37,7 @@ Estimated Time: 20 minutes
       object_value VARCHAR2(4000) NOT NULL,
       object_kind  VARCHAR2(10) NOT NULL
         CHECK (object_kind IN ('iri', 'literal')),
-      datatype_uri VARCHAR2(500),
+     datatype_uri VARCHAR2(500),
       unit_value   VARCHAR2(64)
     );
     ```
@@ -47,33 +47,87 @@ Estimated Time: 20 minutes
 1. Run the following block after replacing GENAI_PROFILE with your chat profile. The ontology is deliberately included in the prompt so the model knows the permitted classes, predicates, inverse relationships, and aliases.
 
     ```sql
-    DECLARE
-  l_prompt CLOB;
+SELECT DBMS_CLOUD_AI.GENERATE(
+  prompt       => 'Return JSON only: {"status":"ok"}',
+  profile_name => 'GENAI_PROFILE',
+  action       => 'chat'
+) AS ai_test
+FROM dual;
+
+DECLARE
+  l_prompt   CLOB;
   l_response CLOB;
 BEGIN
   FOR r IN (
-    SELECT document_id, chunk_id, chunk_text
+    SELECT document_id,
+           chunk_id,
+           chunk_text
     FROM f1_document_chunks
     ORDER BY document_id, chunk_id
   ) LOOP
+
     l_prompt :=
       'Extract only explicitly stated Formula 1 2026 facts. ' ||
-      'Return JSON only: {"triples":[{"subject":"id",' ||
-      '"predicate":"term","object":"id or literal",' ||
-      '"object_kind":"iri or literal","datatype":"IRI or null",' ||
-      '"unit":"unit or null"}]}. ' ||
-      'Use only this ontology: f1:VehicleFeature rdf:type owl:Class. ' ||
-      'f1:EnergyMode rdfs:subClassOf f1:VehicleFeature. ' ||
-      'f1:AeroMode rdfs:subClassOf f1:VehicleFeature. ' ||
-      'f1:LegacySystem rdfs:subClassOf f1:VehicleFeature. ' ||
-      'f1:usesFeature rdf:type owl:ObjectProperty. ' ||
-      'f1:usesEnergyMode rdfs:subPropertyOf f1:usesFeature. ' ||
-      'f1:usesAeroMode rdfs:subPropertyOf f1:usesFeature. ' ||
-      'f1:replacesSystem rdf:type owl:ObjectProperty. ' ||
-      'f1:replacedBy owl:inverseOf f1:replacesSystem. ' ||
-      'f1:Tyre owl:sameAs f1:Tire. ' ||
-      'Text to extract from: ' ||
-      DBMS_LOB.SUBSTR(r.chunk_text, 12000, 1);
+      'Do not infer or invent facts. ' ||
+      'Return JSON only in this format: ' ||
+      '{"triples":[{"subject":"id","predicate":"term",' ||
+      '"object":"id or literal","object_kind":"iri or literal",' ||
+      '"datatype":"IRI or null","unit":"unit or null"}]}. ' ||
+      q'~
+Use only this ontology:
+
+f1:VehicleFeature rdf:type owl:Class .
+f1:VehicleDimension rdf:type owl:Class .
+f1:Measurement rdf:type owl:Class .
+f1:Unit rdf:type owl:Class .
+
+f1:EnergyMode rdf:type owl:Class ;
+    rdfs:subClassOf f1:VehicleFeature .
+
+f1:AeroMode rdf:type owl:Class ;
+    rdfs:subClassOf f1:VehicleFeature .
+
+f1:LegacySystem rdf:type owl:Class ;
+    rdfs:subClassOf f1:VehicleFeature .
+
+f1:ChargingTechnique rdf:type owl:Class .
+
+f1:Tyre rdf:type owl:Class .
+
+f1:FrontTyre rdf:type owl:Class ;
+    rdfs:subClassOf f1:Tyre .
+
+f1:RearTyre rdf:type owl:Class ;
+    rdfs:subClassOf f1:Tyre .
+
+f1:LengthMeasurement rdfs:subClassOf f1:Measurement .
+f1:WeightMeasurement rdfs:subClassOf f1:Measurement .
+
+f1:usesFeature rdf:type owl:ObjectProperty .
+f1:hasMeasurement rdf:type owl:ObjectProperty .
+f1:hasUnit rdf:type owl:ObjectProperty .
+f1:measures rdf:type owl:ObjectProperty .
+
+f1:usesEnergyMode rdf:type owl:ObjectProperty ;
+    rdfs:subPropertyOf f1:usesFeature .
+
+f1:usesAeroMode rdf:type owl:ObjectProperty ;
+    rdfs:subPropertyOf f1:usesFeature .
+
+f1:replacesSystem rdf:type owl:ObjectProperty .
+
+f1:replacedBy rdf:type owl:ObjectProperty ;
+    owl:inverseOf f1:replacesSystem .
+
+f1:occursDuring rdf:type owl:ObjectProperty .
+f1:disables rdf:type owl:ObjectProperty .
+f1:keepsState rdf:type owl:ObjectProperty .
+
+f1:Tyre owl:sameAs f1:Tire .
+
+Text to extract from:
+~' ||
+      r.chunk_text;
 
     l_response := DBMS_CLOUD_AI.GENERATE(
       prompt       => l_prompt,
@@ -81,9 +135,19 @@ BEGIN
       action       => 'chat'
     );
 
-    INSERT INTO f1_rdf_extract_stg (document_id, chunk_id, response)
-    VALUES (r.document_id, r.chunk_id, l_response);
+    INSERT INTO f1_rdf_extract_stg (
+      document_id,
+      chunk_id,
+      response
+    )
+    VALUES (
+      r.document_id,
+      r.chunk_id,
+      l_response
+    );
+
   END LOOP;
+
   COMMIT;
 END;
 /
